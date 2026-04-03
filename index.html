@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Inventory Calendar - Division 701 FM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Red+Hat+Display:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--primary:#00b894;--primary-dark:#00916e;--secondary:#6c5ce7;--accent:#fdcb6e;--danger:#ff7675;--bg-dark:#0a0e27;--bg-card:#1a1f3a;--bg-input:#141831;--text-light:#fff;--text-muted:#a0a8c8;--highlight:#74b9ff;--d6:#00cec9;--d6l:#81ecec;--d8:#e17055;--d8l:#fab1a0;--d9:#a29bfe;--d9l:#d4cfff;--prep:#636e72;--cs:#e74c3c;--rx:#9b59b6;--mgc:#f39c12;--ale:#27ae60}
+        body{font-family:'Red Hat Display',sans-serif;background:linear-gradient(135deg,#0a0e27,#1a1f3a 50%,#2d3561);color:var(--text-light);min-height:100vh;padding:2rem;position:relative;overflow-x:hidden}
+        body::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 20% 50%,rgba(0,206,201,.1) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(225,112,85,.1) 0%,transparent 50%),radial-gradient(circle at 40% 20%,rgba(162,155,254,.07) 0%,transparent 50%);animation:gs 20s ease infinite;z-index:0}
+        @keyframes gs{0%,100%{transform:translate(0,0) rotate(0)}50%{transform:translate(-5%,-5%) rotate(180deg)}}
+        .container{max-width:1400px;margin:0 auto;position:relative;z-index:1}
+        .header{text-align:center;margin-bottom:1.5rem;animation:sd .8s cubic-bezier(.16,1,.3,1)}
+        @keyframes sd{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+        h1{font-family:'Righteous',cursive;font-size:3rem;background:linear-gradient(135deg,var(--d6),var(--secondary) 50%,var(--d8));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.5rem}
+        .subtitle{font-size:1.1rem;color:var(--text-muted);font-weight:500}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}
+
+        /* ── Filter Bar ── */
+        .filter-bar{background:var(--bg-card);border-radius:16px;padding:1.25rem;margin-bottom:1.5rem;border:2px solid rgba(0,184,148,.15);box-shadow:0 8px 32px rgba(0,0,0,.25);animation:sd .6s cubic-bezier(.16,1,.3,1) .1s both}
+        .filter-row{display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap}
+        .filter-group{display:flex;flex-direction:column;gap:.35rem}
+        .filter-group.search{flex:1;min-width:200px}
+        .filter-group.district{min-width:170px}
+        .filter-group.stores{flex:2;min-width:250px}
+        .filter-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted)}
+        .search-input{background:var(--bg-input);border:2px solid rgba(116,185,255,.2);border-radius:10px;color:var(--text-light);font-family:'Red Hat Display',sans-serif;font-size:.95rem;padding:.65rem 1rem .65rem 2.5rem;width:100%;outline:none;transition:border-color .3s,box-shadow .3s}
+        .search-input:focus{border-color:var(--highlight);box-shadow:0 0 20px rgba(116,185,255,.15)}
+        .search-input::placeholder{color:rgba(160,168,200,.5)}
+        .search-wrap{position:relative}
+        .search-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);font-size:.9rem;color:var(--text-muted);pointer-events:none}
+        .search-clear{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);font-size:1.1rem;cursor:pointer;display:none;padding:0 4px;line-height:1;transition:color .2s}
+        .search-clear:hover{color:var(--text-light)}
+        .search-clear.visible{display:block}
+        .district-select{background:var(--bg-input);border:2px solid rgba(0,184,148,.2);border-radius:10px;color:var(--text-light);font-family:'Red Hat Display',sans-serif;font-size:.9rem;font-weight:600;padding:.65rem .85rem;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0a8c8' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .8rem center;padding-right:2.2rem;transition:border-color .3s}
+        .district-select:focus{border-color:var(--primary)}
+        .district-select option{background:var(--bg-dark);color:var(--text-light)}
+
+        /* ── Store Picker ── */
+        .store-picker{position:relative}
+        .sp-trigger{background:var(--bg-input);border:2px solid rgba(253,203,110,.2);border-radius:10px;padding:.45rem .75rem;min-height:42px;display:flex;align-items:center;flex-wrap:wrap;gap:.3rem;cursor:pointer;transition:border-color .3s}
+        .sp-trigger:hover{border-color:rgba(253,203,110,.4)}
+        .sp-trigger.open{border-color:var(--accent);border-bottom-left-radius:0;border-bottom-right-radius:0}
+        .sp-ph{color:rgba(160,168,200,.5);font-size:.85rem;user-select:none}
+        .store-chip{font-size:.65rem;font-weight:600;padding:3px 8px;border-radius:6px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+        .store-chip.d6{background:rgba(0,206,201,.2);color:var(--d6l);border:1px solid rgba(0,206,201,.3)}
+        .store-chip.d8{background:rgba(225,112,85,.2);color:var(--d8l);border:1px solid rgba(225,112,85,.3)}
+        .store-chip.d9{background:rgba(162,155,254,.2);color:var(--d9l);border:1px solid rgba(162,155,254,.3)}
+        .chip-x{cursor:pointer;font-size:.75rem;opacity:.7;transition:opacity .2s;line-height:1}
+        .chip-x:hover{opacity:1}
+        .sp-dd{position:absolute;top:100%;left:0;right:0;background:var(--bg-input);border:2px solid var(--accent);border-top:1px solid rgba(253,203,110,.15);border-radius:0 0 10px 10px;max-height:240px;overflow-y:auto;z-index:50;display:none;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+        .sp-dd.open{display:block}
+        .sp-dd::-webkit-scrollbar{width:5px}
+        .sp-dd::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:10px}
+        .sp-opt{padding:.5rem .85rem;font-size:.8rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;transition:background .15s;border-bottom:1px solid rgba(255,255,255,.03)}
+        .sp-opt:hover{background:rgba(255,255,255,.06)}
+        .sp-opt.sel{background:rgba(0,184,148,.1)}
+        .sp-cb{width:16px;height:16px;border:2px solid var(--text-muted);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+        .sp-opt.sel .sp-cb{background:var(--primary);border-color:var(--primary)}
+        .sp-opt.sel .sp-cb::after{content:'✓';font-size:.6rem;color:#fff;font-weight:900}
+        .sp-opt-name{font-weight:600}
+        .sp-opt-num{color:var(--text-muted);font-size:.7rem}
+        .filter-actions{display:flex;gap:.5rem;align-items:flex-end;padding-bottom:2px}
+        .fbtn{background:none;border:1.5px solid rgba(255,255,255,.15);color:var(--text-muted);font-family:'Red Hat Display',sans-serif;font-size:.7rem;font-weight:700;padding:.55rem .9rem;border-radius:8px;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:all .25s;white-space:nowrap}
+        .fbtn:hover{border-color:var(--primary);color:var(--primary);background:rgba(0,184,148,.08)}
+        .filter-summary{font-size:.7rem;color:var(--accent);margin-top:.6rem;padding-top:.5rem;border-top:1px solid rgba(255,255,255,.05);display:none}
+        .filter-summary.vis{display:block}
+
+        /* ── Info Panel ── */
+        .current-info{background:var(--bg-card);border-radius:20px;padding:1.5rem;margin-bottom:1.5rem;border:2px solid rgba(0,206,201,.2);box-shadow:0 10px 40px rgba(0,0,0,.3)}
+        .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}
+        .info-item{text-align:center}
+        .info-label{font-size:.8rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:.3rem;font-weight:500}
+        .info-value{font-size:1.3rem;font-weight:900;color:var(--primary)}
+        .info-value.urgent{color:var(--danger);animation:pulse 2s ease-in-out infinite}
+
+        /* ── District Columns ── */
+        .dcols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:2rem}
+        .dcols.c1{grid-template-columns:1fr}
+        .dcols.c2{grid-template-columns:1fr 1fr}
+        .dcol{background:var(--bg-card);border-radius:16px;border:2px solid;overflow:hidden;display:flex;flex-direction:column;max-height:600px;transition:opacity .3s}
+        .dcol.hide{display:none}
+        .dcol.d6{border-color:rgba(0,206,201,.35)}.dcol.d8{border-color:rgba(225,112,85,.35)}.dcol.d9{border-color:rgba(162,155,254,.35)}
+        .dcol-hd{padding:1rem 1.25rem;font-family:'Righteous',cursive;font-size:1.15rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2}
+        .d6 .dcol-hd{background:linear-gradient(135deg,rgba(0,206,201,.2),rgba(0,206,201,.05));color:var(--d6l)}
+        .d8 .dcol-hd{background:linear-gradient(135deg,rgba(225,112,85,.2),rgba(225,112,85,.05));color:var(--d8l)}
+        .d9 .dcol-hd{background:linear-gradient(135deg,rgba(162,155,254,.2),rgba(162,155,254,.05));color:var(--d9l)}
+        .dcol-hd .sc{font-family:'Red Hat Display',sans-serif;font-size:.7rem;font-weight:600;opacity:.7;letter-spacing:.5px}
+        .dcol-bd{padding:.75rem;overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.1) transparent}
+        .dcol-bd::-webkit-scrollbar{width:5px}
+        .dcol-bd::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:10px}
+        .scard{background:rgba(0,0,0,.2);border-radius:10px;padding:.7rem .85rem;margin-bottom:.5rem;border-left:4px solid;transition:all .25s;position:relative}
+        .scard:hover{background:rgba(0,0,0,.35);transform:translateX(3px)}
+        .scard.d6{border-left-color:var(--d6)}.scard.d8{border-left-color:var(--d8)}.scard.d9{border-left-color:var(--d9)}
+        .scard-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem}
+        .scard-nm{font-weight:700;font-size:.9rem}
+        .scard-svc{font-size:.65rem;color:var(--text-muted);padding:2px 6px;background:rgba(255,255,255,.06);border-radius:4px}
+        .scard-cts{display:flex;flex-wrap:wrap;gap:.3rem}
+        .scb{font-size:.6rem;padding:2px 6px;border-radius:4px;font-weight:600;display:flex;align-items:center;gap:3px}
+        .scb .sd{opacity:.8;font-weight:400}
+        .scb.cs{background:rgba(231,76,60,.25);color:#ff7b7b;border:1px solid rgba(231,76,60,.4)}
+        .scb.rx{background:rgba(155,89,182,.25);color:#c38ef7;border:1px solid rgba(155,89,182,.4)}
+        .scb.mgc{background:rgba(243,156,18,.25);color:#fbc95e;border:1px solid rgba(243,156,18,.4)}
+        .scb.ale{background:rgba(39,174,96,.25);color:#6ee7a0;border:1px solid rgba(39,174,96,.4)}
+        .scard-cd{position:absolute;top:.6rem;right:.75rem;text-align:right}
+        .cdn{font-size:1.1rem;font-weight:900;line-height:1}.cdn.u{color:var(--danger)}.cdn.s{color:var(--accent)}.cdn.o{color:var(--primary)}
+        .cdl{font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+        .no-up{text-align:center;padding:2rem 1rem;color:var(--text-muted);font-size:.85rem;opacity:.6}
+
+        /* ── Navigation ── */
+        .nav{display:flex;justify-content:center;align-items:center;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap}
+        .nbtn{background:var(--bg-card);border:2px solid var(--primary);color:var(--primary);padding:.75rem 1.5rem;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:all .3s cubic-bezier(.16,1,.3,1);display:flex;align-items:center;gap:.5rem;font-family:'Red Hat Display',sans-serif}
+        .nbtn:hover:not(:disabled){background:var(--primary);color:var(--text-light);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,184,148,.3)}
+        .nbtn:disabled{opacity:.3;cursor:not-allowed;border-color:var(--text-muted);color:var(--text-muted)}
+        .ninfo{font-family:'Righteous',cursive;font-size:1.8rem;color:var(--primary);min-width:220px;text-align:center}
+
+        /* ── Calendar ── */
+        .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.5rem;margin-bottom:1.5rem}
+        .wh{background:var(--bg-card);padding:.6rem;text-align:center;font-weight:700;font-size:.8rem;color:var(--text-muted);border-radius:8px;text-transform:uppercase;letter-spacing:1px}
+        .dc{background:var(--bg-card);border-radius:10px;padding:.5rem;min-height:100px;display:flex;flex-direction:column;transition:all .3s cubic-bezier(.16,1,.3,1);border:2px solid transparent;position:relative;cursor:pointer}
+        .dc:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(0,0,0,.3)}
+        .dn{font-size:1rem;font-weight:700;color:var(--text-light);margin-bottom:.15rem}
+        .dw{font-size:.6rem;color:var(--text-muted);margin-bottom:.3rem}
+        .ec{background:transparent;border:none;cursor:default}.ec:hover{transform:none;box-shadow:none}
+        .td{border-color:var(--highlight);box-shadow:0 0 20px rgba(116,185,255,.3)}.td .dn{color:var(--highlight)}
+        .pw{background:linear-gradient(135deg,rgba(99,110,114,.25),rgba(45,52,54,.25));border-color:var(--prep)}
+        .hc{background:linear-gradient(135deg,rgba(231,76,60,.25),rgba(155,89,182,.15));border-color:var(--cs)}
+        .hc.hm{border-color:var(--mgc)}
+        .st{display:flex;flex-direction:column;gap:2px;flex-grow:1;overflow-y:auto;max-height:70px}
+        .stg{font-size:.5rem;padding:2px 4px;border-radius:3px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:3px}
+        .stg.d6{background:rgba(0,206,201,.25);color:var(--d6l);border-left:2px solid var(--d6)}
+        .stg.d8{background:rgba(225,112,85,.25);color:var(--d8l);border-left:2px solid var(--d8)}
+        .stg.d9{background:rgba(162,155,254,.25);color:var(--d9l);border-left:2px solid var(--d9)}
+        .cb{font-size:.45rem;padding:1px 3px;border-radius:2px;font-weight:700}
+        .cb.cs{background:var(--cs);color:#fff}.cb.rx{background:var(--rx);color:#fff}.cb.mgc{background:var(--mgc);color:#fff}.cb.ale{background:var(--ale);color:#fff}
+        .tl{font-size:.45rem;color:var(--text-muted);margin-left:2px}
+
+        /* ── Legend ── */
+        .legend{display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin-top:1.5rem;padding:1.25rem;background:var(--bg-card);border-radius:12px;border:2px solid rgba(0,184,148,.1)}
+        .li{display:flex;align-items:center;gap:.5rem}
+        .lb{width:24px;height:24px;border-radius:6px;border:2px solid}
+        .lb.d6{background:rgba(0,206,201,.3);border-color:var(--d6)}.lb.d8{background:rgba(225,112,85,.3);border-color:var(--d8)}.lb.d9{background:rgba(162,155,254,.3);border-color:var(--d9)}.lb.pr{background:rgba(99,110,114,.3);border-color:var(--prep)}.lb.to{background:var(--bg-card);border-color:var(--highlight)}
+        .lt{font-weight:600;font-size:.8rem}
+        .li.ck{cursor:pointer;padding:.4rem .8rem;border-radius:8px;transition:all .3s}.li.ck:hover{background:rgba(116,185,255,.2);transform:translateY(-2px)}
+        .cl{display:flex;gap:.75rem;align-items:center;padding:.5rem 1rem;background:rgba(0,0,0,.2);border-radius:8px}
+        .cli{display:flex;align-items:center;gap:.3rem;font-size:.75rem}
+        .cd{width:12px;height:12px;border-radius:3px}.cd.cs{background:var(--cs)}.cd.rx{background:var(--rx)}.cd.mgc{background:var(--mgc)}.cd.ale{background:var(--ale)}
+
+        /* ── Popup ── */
+        .po{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:999;opacity:0;visibility:hidden;transition:all .3s}.po.sh{opacity:1;visibility:visible}
+        .pp{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:var(--bg-card);border:3px solid var(--primary);border-radius:20px;padding:1.5rem;z-index:1000;min-width:380px;max-width:90vw;max-height:80vh;overflow-y:auto;opacity:0;transition:all .4s cubic-bezier(.16,1,.3,1)}.pp.sh{transform:translate(-50%,-50%) scale(1);opacity:1}
+        .pc{position:absolute;top:10px;right:15px;background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;transition:color .3s}.pc:hover{color:var(--text-light)}
+        .pt{font-family:'Righteous',cursive;font-size:1.3rem;color:var(--primary);margin-bottom:.5rem}
+        .ps{margin-bottom:1rem}
+        .pst{font-weight:700;font-size:.9rem;margin-bottom:.5rem;padding-bottom:.25rem;border-bottom:1px solid rgba(255,255,255,.1)}.pst.cts{color:var(--cs)}.pst.prp{color:var(--accent)}
+        .pstr{background:rgba(0,0,0,.2);border-radius:8px;padding:.75rem;border-left:4px solid;margin-bottom:.5rem}
+        .pstr.d6{border-left-color:var(--d6)}.pstr.d8{border-left-color:var(--d8)}.pstr.d9{border-left-color:var(--d9)}
+        .psh{display:flex;justify-content:space-between;align-items:center;margin-bottom:.25rem}
+        .psn{font-weight:700;font-size:1rem}
+        .psd{font-size:.75rem;color:var(--text-muted)}
+        .pcb{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.4rem}
+        .pcbd{font-size:.7rem;padding:3px 8px;border-radius:4px;font-weight:600}
+        .pcbd.cs{background:rgba(231,76,60,.3);color:#ff6b6b;border:1px solid var(--cs)}.pcbd.rx{background:rgba(155,89,182,.3);color:#a855f7;border:1px solid var(--rx)}.pcbd.mgc{background:rgba(243,156,18,.3);color:#fbbf24;border:1px solid var(--mgc)}.pcbd.ale{background:rgba(39,174,96,.3);color:#4ade80;border:1px solid var(--ale)}
+
+        @media(max-width:900px){.dcols{grid-template-columns:1fr!important}.dcol{max-height:400px}.filter-row{flex-direction:column}.filter-group{width:100%}}
+        @media(max-width:768px){h1{font-size:1.8rem}.cal{gap:.3rem}.dc{padding:.4rem;min-height:80px}.dn{font-size:.85rem}.stg{font-size:.45rem}.nav{gap:.75rem}.nbtn{padding:.6rem 1rem;font-size:.85rem}.ninfo{min-width:140px;font-size:1.2rem}.legend{flex-direction:column;align-items:center;gap:.75rem}}
+    </style>
+</head>
+<body>
+    <div class="po" id="popupOverlay"></div>
+    <div class="pp" id="popup">
+        <button class="pc" id="popupClose">&times;</button>
+        <div class="pt" id="popupTitle"></div>
+        <div id="popupContent"></div>
+    </div>
+    <div class="container">
+        <div class="header"><h1>2026 Inventory Calendar</h1><div class="subtitle">Division 701 Fred Meyer • Districts 6, 8 & 9</div></div>
+
+        <div class="filter-bar">
+            <div class="filter-row">
+                <div class="filter-group search">
+                    <div class="filter-label">Search</div>
+                    <div class="search-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Store name, number, count type, date…">
+                        <button class="search-clear" id="searchClear">&times;</button>
+                    </div>
+                </div>
+                <div class="filter-group district">
+                    <div class="filter-label">District</div>
+                    <select class="district-select" id="districtSelect">
+                        <option value="all">All Districts</option>
+                        <option value="6">District 6</option>
+                        <option value="8">District 8</option>
+                        <option value="9">District 9</option>
+                    </select>
+                </div>
+                <div class="filter-group stores">
+                    <div class="filter-label">Stores</div>
+                    <div class="store-picker" id="storePicker">
+                        <div class="sp-trigger" id="spTrigger">
+                            <span class="sp-ph" id="spPh">All stores shown</span>
+                        </div>
+                        <div class="sp-dd" id="spDd"></div>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="fbtn" id="selAllBtn">Select All</button>
+                    <button class="fbtn" id="clrBtn">Clear All</button>
+                </div>
+            </div>
+            <div class="filter-summary" id="filterSum"></div>
+        </div>
+
+        <div class="current-info">
+            <div class="info-grid">
+                <div class="info-item"><div class="info-label">Today</div><div class="info-value" id="todayDate">-</div></div>
+                <div class="info-item"><div class="info-label">Next Count</div><div class="info-value urgent" id="nextCount">-</div></div>
+                <div class="info-item"><div class="info-label">Days Until</div><div class="info-value" id="daysUntil">-</div></div>
+                <div class="info-item"><div class="info-label">In Prep Window</div><div class="info-value" id="inPrep">-</div></div>
+            </div>
+        </div>
+
+        <div class="dcols" id="dcolsWrap">
+            <div class="dcol d6" id="dc6"><div class="dcol-hd"><span>District 6</span><span class="sc" id="d6c"></span></div><div class="dcol-bd" id="d6b"></div></div>
+            <div class="dcol d8" id="dc8"><div class="dcol-hd"><span>District 8</span><span class="sc" id="d8c"></span></div><div class="dcol-bd" id="d8b"></div></div>
+            <div class="dcol d9" id="dc9"><div class="dcol-hd"><span>District 9</span><span class="sc" id="d9c"></span></div><div class="dcol-bd" id="d9b"></div></div>
+        </div>
+
+        <div class="nav"><button class="nbtn" id="prevBtn"><span>←</span> Previous</button><div class="ninfo" id="navInfo"></div><button class="nbtn" id="nextBtn">Next <span>→</span></button></div>
+        <div id="calWrap"></div>
+        <div class="nav"><button class="nbtn" id="prevBtn2"><span>←</span> Previous</button><div class="ninfo" id="navInfo2"></div><button class="nbtn" id="nextBtn2">Next <span>→</span></button></div>
+
+        <div class="legend">
+            <div class="li"><div class="lb d6"></div><div class="lt">District 6</div></div>
+            <div class="li"><div class="lb d8"></div><div class="lt">District 8</div></div>
+            <div class="li"><div class="lb d9"></div><div class="lt">District 9</div></div>
+            <div class="li"><div class="lb pr"></div><div class="lt">2-Week Prep</div></div>
+            <div class="li ck" id="todayLeg" title="Return to today"><div class="lb to"></div><div class="lt">Today</div></div>
+            <div class="cl"><div class="cli"><div class="cd cs"></div>Center Store</div><div class="cli"><div class="cd rx"></div>Pharmacy</div><div class="cli"><div class="cd mgc"></div>Magic</div><div class="cli"><div class="cd ale"></div>Apparel</div></div>
+        </div>
+    </div>
+<script>
+const D=[
+// D6
+{s:49,n:"Coeur d'Alene",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-16"},{s:49,n:"Coeur d'Alene",d:6,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-03-16"},{s:49,n:"Coeur d'Alene",d:6,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-03-17"},
+{s:49,n:"Coeur d'Alene",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-04-09"},{s:49,n:"Coeur d'Alene",d:6,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-04-09"},
+{s:163,n:"Kennewick",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-26"},{s:163,n:"Kennewick",d:6,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-03-26"},{s:163,n:"Kennewick",d:6,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-04-08"},{s:163,n:"Kennewick",d:6,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-04-09"},
+{s:214,n:"Wandermere",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-06-08"},{s:214,n:"Wandermere",d:6,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-06-08"},{s:214,n:"Wandermere",d:6,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-07-20"},{s:214,n:"Wandermere",d:6,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-07-21"},
+{s:286,n:"Richland",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-04-28"},{s:286,n:"Richland",d:6,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-04-28"},{s:286,n:"Richland",d:6,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-05-12"},{s:286,n:"Richland",d:6,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-05-13"},
+{s:351,n:"Spokane Sullivan",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-09-30"},{s:351,n:"Spokane Sullivan",d:6,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-09-30"},{s:351,n:"Spokane Sullivan",d:6,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-10-21"},{s:351,n:"Spokane Sullivan",d:6,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-10-22"},
+{s:486,n:"Yakima",d:6,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-03-05"},{s:486,n:"Yakima",d:6,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-03-06"},{s:486,n:"Yakima",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-19"},{s:486,n:"Yakima",d:6,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-06-03"},
+{s:652,n:"Ellensburg",d:6,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-04-16"},{s:652,n:"Ellensburg",d:6,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-04-17"},{s:652,n:"Ellensburg",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-04-21"},{s:652,n:"Ellensburg",d:6,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-04-21"},
+{s:654,n:"East Wenatchee",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-12"},{s:654,n:"East Wenatchee",d:6,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-03-12"},{s:654,n:"East Wenatchee",d:6,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-04-14"},{s:654,n:"East Wenatchee",d:6,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-04-15"},
+{s:657,n:"Thor Street",d:6,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-07-09"},{s:657,n:"Thor Street",d:6,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-07-09"},{s:657,n:"Thor Street",d:6,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-08-03"},{s:657,n:"Thor Street",d:6,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-08-04"},
+// D8
+{s:19,n:"Auburn",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-06-09"},{s:19,n:"Auburn",d:8,sv:"RIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-06-10"},{s:19,n:"Auburn",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-06-15"},{s:19,n:"Auburn",d:8,sv:"RIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-06-15"},{s:19,n:"Auburn",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2027-01-18"},{s:19,n:"Auburn",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2027-01-21"},{s:19,n:"Auburn",d:8,sv:"RIS",c:"ALE",ct:"MGC 2nd Count",dt:"2027-01-22"},
+{s:23,n:"Bellevue",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-05-18"},{s:23,n:"Bellevue",d:8,sv:"RIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-05-18"},{s:23,n:"Bellevue",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-06-11"},{s:23,n:"Bellevue",d:8,sv:"RIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-06-12"},
+{s:28,n:"Burien",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-03"},{s:28,n:"Burien",d:8,sv:"RIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-03-03"},{s:28,n:"Burien",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-03-04"},{s:28,n:"Burien",d:8,sv:"RIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-03-05"},{s:28,n:"Burien",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-08-25"},{s:28,n:"Burien",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-09-02"},{s:28,n:"Burien",d:8,sv:"RIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-09-03"},
+{s:31,n:"Benson Plaza",d:8,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-03-10"},{s:31,n:"Benson Plaza",d:8,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-03-11"},{s:31,n:"Benson Plaza",d:8,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-19"},{s:31,n:"Benson Plaza",d:8,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-03-19"},{s:31,n:"Benson Plaza",d:8,sv:"WIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-09-22"},{s:31,n:"Benson Plaza",d:8,sv:"WIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-09-23"},{s:31,n:"Benson Plaza",d:8,sv:"WIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-10-08"},
+{s:53,n:"Covington",d:8,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-05-13"},{s:53,n:"Covington",d:8,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-05-13"},{s:53,n:"Covington",d:8,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-05-28"},{s:53,n:"Covington",d:8,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-05-29"},{s:53,n:"Covington",d:8,sv:"WIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-10-19"},{s:53,n:"Covington",d:8,sv:"WIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-10-20"},{s:53,n:"Covington",d:8,sv:"WIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-10-22"},
+{s:215,n:"Redondo",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-05-11"},{s:215,n:"Redondo",d:8,sv:"RIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-05-12"},{s:215,n:"Redondo",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-06-16"},{s:215,n:"Redondo",d:8,sv:"RIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-06-16"},{s:215,n:"Redondo",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-10-13"},{s:215,n:"Redondo",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-10-21"},{s:215,n:"Redondo",d:8,sv:"RIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-10-22"},
+{s:391,n:"Kirkland",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-04-21"},{s:391,n:"Kirkland",d:8,sv:"RIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-04-21"},{s:391,n:"Kirkland",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-05-14"},{s:391,n:"Kirkland",d:8,sv:"RIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-05-15"},
+{s:459,n:"Renton",d:8,sv:"WIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-06-16"},{s:459,n:"Renton",d:8,sv:"WIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-06-16"},{s:459,n:"Renton",d:8,sv:"WIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-06-29"},{s:459,n:"Renton",d:8,sv:"WIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-06-30"},{s:459,n:"Renton",d:8,sv:"WIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2027-01-21"},{s:459,n:"Renton",d:8,sv:"WIS",c:"ALE",ct:"MGC 2nd Count",dt:"2027-01-22"},{s:459,n:"Renton",d:8,sv:"WIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2027-01-25"},
+{s:658,n:"Issaquah",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-07-21"},{s:658,n:"Issaquah",d:8,sv:"RIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-07-21"},{s:658,n:"Issaquah",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-07-22"},{s:658,n:"Issaquah",d:8,sv:"RIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-07-23"},
+{s:682,n:"Maple Valley",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-16"},{s:682,n:"Maple Valley",d:8,sv:"RIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-03-16"},{s:682,n:"Maple Valley",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-03-17"},{s:682,n:"Maple Valley",d:8,sv:"RIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-07-20"},{s:682,n:"Maple Valley",d:8,sv:"RIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-08-05"},
+// D9
+{s:11,n:"Northern Lights",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-03-02"},{s:11,n:"Northern Lights",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-03-03"},{s:11,n:"Northern Lights",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-03-04"},{s:11,n:"Northern Lights",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-09"},{s:11,n:"Northern Lights",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 2nd Count",dt:"2026-07-28"},{s:11,n:"Northern Lights",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-07-29"},{s:11,n:"Northern Lights",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-07-30"},{s:11,n:"Northern Lights",d:9,sv:"AIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-07-31"},
+{s:17,n:"Soldotna",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-02-18"},{s:17,n:"Soldotna",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-02-19"},{s:17,n:"Soldotna",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-02-19"},{s:17,n:"Soldotna",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-02-20"},
+{s:18,n:"Muldoon",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-10"},{s:18,n:"Muldoon",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-03-11"},{s:18,n:"Muldoon",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-03-12"},{s:18,n:"Muldoon",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-03-13"},{s:18,n:"Muldoon",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-08-03"},{s:18,n:"Muldoon",d:9,sv:"AIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-08-04"},{s:18,n:"Muldoon",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-08-11"},{s:18,n:"Muldoon",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 2nd Count",dt:"2026-08-12"},
+{s:71,n:"Dimond",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-03-05"},{s:71,n:"Dimond",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-03-06"},{s:71,n:"Dimond",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-04-01"},{s:71,n:"Dimond",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-04-22"},{s:71,n:"Dimond",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-09-14"},{s:71,n:"Dimond",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-09-15"},{s:71,n:"Dimond",d:9,sv:"AIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-09-16"},{s:71,n:"Dimond",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 2nd Count",dt:"2026-09-17"},
+{s:158,n:"Juneau",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-04-13"},{s:158,n:"Juneau",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-04-14"},{s:158,n:"Juneau",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-04-14"},{s:158,n:"Juneau",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-04-15"},{s:158,n:"Juneau",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-10-12"},{s:158,n:"Juneau",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-10-13"},{s:158,n:"Juneau",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 2nd Count",dt:"2026-10-13"},{s:158,n:"Juneau",d:9,sv:"AIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-10-14"},
+{s:224,n:"East Fairbanks",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-05-05"},{s:224,n:"East Fairbanks",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-05-12"},{s:224,n:"East Fairbanks",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-05-13"},{s:224,n:"East Fairbanks",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-05-13"},{s:224,n:"East Fairbanks",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2027-01-05"},{s:224,n:"East Fairbanks",d:9,sv:"AIS",c:"ALE",ct:"MGC 2nd Count",dt:"2027-01-06"},{s:224,n:"East Fairbanks",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 2nd Count",dt:"2027-01-06"},{s:224,n:"East Fairbanks",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2027-01-18"},
+{s:485,n:"West Fairbanks",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-05-06"},{s:485,n:"West Fairbanks",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-05-14"},{s:485,n:"West Fairbanks",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-05-14"},{s:485,n:"West Fairbanks",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-05-15"},{s:485,n:"West Fairbanks",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2027-01-07"},{s:485,n:"West Fairbanks",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 2nd Count",dt:"2027-01-07"},{s:485,n:"West Fairbanks",d:9,sv:"AIS",c:"ALE",ct:"MGC 2nd Count",dt:"2027-01-08"},{s:485,n:"West Fairbanks",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2027-01-19"},
+{s:649,n:"Palmer",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-04-20"},{s:649,n:"Palmer",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-04-27"},{s:649,n:"Palmer",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-04-28"},
+{s:653,n:"Wasilla",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-04-08"},{s:653,n:"Wasilla",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-04-09"},{s:653,n:"Wasilla",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-04-10"},{s:653,n:"Wasilla",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-04-21"},{s:653,n:"Wasilla",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 2nd Count",dt:"2026-09-23"},{s:653,n:"Wasilla",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-09-24"},{s:653,n:"Wasilla",d:9,sv:"AIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-09-25"},{s:653,n:"Wasilla",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-09-28"},
+{s:656,n:"SE Anchorage",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-08-10"},{s:656,n:"SE Anchorage",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-08-19"},{s:656,n:"SE Anchorage",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-08-20"},{s:656,n:"SE Anchorage",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-08-21"},
+{s:668,n:"Eagle River",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 1st Count",dt:"2026-03-31"},{s:668,n:"Eagle River",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 1st Count",dt:"2026-04-29"},{s:668,n:"Eagle River",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 1st Count",dt:"2026-04-30"},{s:668,n:"Eagle River",d:9,sv:"AIS",c:"ALE",ct:"MGC 1st Count",dt:"2026-05-01"},{s:668,n:"Eagle River",d:9,sv:"AIS",c:"CENTER STORE",ct:"CS 2nd Count",dt:"2026-09-29"},{s:668,n:"Eagle River",d:9,sv:"AIS",c:"PHARMACY",ct:"RX 2nd Count",dt:"2026-09-30"},{s:668,n:"Eagle River",d:9,sv:"AIS",c:"MAGIC",ct:"MGC 2nd Count",dt:"2026-10-19"},{s:668,n:"Eagle River",d:9,sv:"AIS",c:"ALE",ct:"MGC 2nd Count",dt:"2026-10-20"}
+];
+
+const P=14,MN=['January','February','March','April','May','June','July','August','September','October','November','December'],DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let cOff=0;const MNO=-2,MXO=14;
+const tls=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const fd=s=>{const d=new Date(s+'T00:00:00');return`${MN[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`};
+const fs=s=>{const d=new Date(s+'T00:00:00');return`${d.getMonth()+1}/${d.getDate()}`};
+const db=(a,b)=>Math.ceil((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5);
+const bc=c=>c==='CENTER STORE'?'cs':c==='PHARMACY'?'rx':c==='MAGIC'?'mgc':'ale';
+const ab=c=>c==='CENTER STORE'?'CS':c==='PHARMACY'?'RX':c==='MAGIC'?'MGC':'ALE';
+
+let fDist='all',selStores=new Set(),sQuery='';
+
+function uStores(df){const m={};D.forEach(e=>{if(df!=='all'&&String(e.d)!==df)return;if(!m[e.s])m[e.s]={s:e.s,n:e.n,d:e.d,sv:e.sv}});return Object.values(m).sort((a,b)=>a.s-b.s)}
+function mSearch(e,q){if(!q)return true;const l=q.toLowerCase();return l.split(/\s+/).every(t=>`${e.s} ${e.n} ${e.c} ${e.ct} ${e.dt} ${e.sv} d${e.d} district ${e.d}`.toLowerCase().includes(t))}
+function gF(){return D.filter(e=>{if(fDist!=='all'&&String(e.d)!==fDist)return false;if(selStores.size>0&&!selStores.has(e.s))return false;return mSearch(e,sQuery)})}
+function vD(){return fDist!=='all'?[parseInt(fDist)]:[6,8,9]}
+
+let ddOpen=false;
+function popDD(){const dd=$('spDd'),st=uStores(fDist);dd.innerHTML=st.map(s=>`<div class="sp-opt${selStores.has(s.s)?' sel':''}" data-s="${s.s}"><div class="sp-cb"></div><span class="sp-opt-num">#${s.s}</span><span class="sp-opt-name">${s.n}</span></div>`).join('');dd.querySelectorAll('.sp-opt').forEach(o=>o.addEventListener('click',ev=>{ev.stopPropagation();const sn=+o.dataset.s;selStores.has(sn)?selStores.delete(sn):selStores.add(sn);o.classList.toggle('sel');rChips();rAll()}))}
+function rChips(){const tr=$('spTrigger'),ph=$('spPh');tr.querySelectorAll('.store-chip').forEach(c=>c.remove());if(!selStores.size){ph.style.display='';ph.textContent='All stores shown'}else{ph.style.display='none';uStores(fDist).filter(s=>selStores.has(s.s)).forEach(s=>{const c=document.createElement('span');c.className=`store-chip d${s.d}`;c.innerHTML=`#${s.s} ${s.n} <span class="chip-x" data-s="${s.s}">&times;</span>`;tr.insertBefore(c,ph)});tr.querySelectorAll('.chip-x').forEach(x=>x.addEventListener('click',ev=>{ev.stopPropagation();selStores.delete(+x.dataset.s);rChips();popDD();rAll()}))}uFS()}
+function togDD(fc){const dd=$('spDd'),tr=$('spTrigger');if(fc||ddOpen){dd.classList.remove('open');tr.classList.remove('open');ddOpen=false}else{popDD();dd.classList.add('open');tr.classList.add('open');ddOpen=true}}
+$('spTrigger').addEventListener('click',e=>{if(e.target.closest('.chip-x'))return;togDD()});
+document.addEventListener('click',e=>{if(!e.target.closest('#storePicker')&&ddOpen)togDD(true)});
+
+function uFS(){const el=$('filterSum'),p=[];if(fDist!=='all')p.push(`District ${fDist}`);if(selStores.size)p.push(`${selStores.size} store${selStores.size>1?'s':''}`);if(sQuery)p.push(`"${sQuery}"`);if(p.length){el.textContent=`Filtering: ${p.join(' · ')} — ${gF().length} events`;el.classList.add('vis')}else el.classList.remove('vis')}
+
+$('districtSelect').addEventListener('change',function(){fDist=this.value;selStores.clear();togDD(true);rChips();popDD();rAll()});
+$('searchInput').addEventListener('input',function(){sQuery=this.value.trim();$('searchClear').classList.toggle('visible',sQuery.length>0);rAll();uFS()});
+$('searchClear').addEventListener('click',()=>{$('searchInput').value='';sQuery='';$('searchClear').classList.remove('visible');rAll();uFS()});
+$('selAllBtn').addEventListener('click',()=>{uStores(fDist).forEach(s=>selStores.add(s.s));rChips();popDD();rAll()});
+$('clrBtn').addEventListener('click',()=>{fDist='all';$('districtSelect').value='all';selStores.clear();sQuery='';$('searchInput').value='';$('searchClear').classList.remove('visible');togDD(true);rChips();popDD();rAll()});
+
+function $(id){return document.getElementById(id)}
+function rAll(){uInfo();rDCols();rCal();uFS()}
+
+function rDCols(){
+    const ts=tls(new Date()),f=gF(),vds=vD(),w=$('dcolsWrap');
+    [6,8,9].forEach(di=>{const col=$('dc'+di);if(!vds.includes(di)){col.classList.add('hide');return}col.classList.remove('hide');
+    const bd=$(`d${di}b`),ce=$(`d${di}c`),ev=f.filter(e=>e.d===di&&e.dt>=ts).sort((a,b)=>a.dt.localeCompare(b.dt));
+    const sm={};ev.forEach(e=>{if(!sm[e.s])sm[e.s]={s:e.s,n:e.n,sv:e.sv,d:e.d,cts:[],ed:e.dt};sm[e.s].cts.push(e)});
+    const stores=Object.values(sm).sort((a,b)=>a.ed.localeCompare(b.ed));
+    ce.textContent=`${stores.length} store${stores.length!==1?'s':''} upcoming`;
+    if(!stores.length){bd.innerHTML='<div class="no-up">No upcoming counts</div>';return}
+    bd.innerHTML=stores.map(st=>{const dy=db(ts,st.ed),cl=dy<=7?'u':dy<=14?'s':'o';
+    return`<div class="scard d${di}"><div class="scard-cd"><div class="cdn ${cl}">${dy}</div><div class="cdl">days</div></div><div class="scard-hd"><div class="scard-nm">#${st.s} ${st.n}</div></div><div style="margin-bottom:.35rem"><span class="scard-svc">${st.sv}</span></div><div class="scard-cts">${st.cts.map(c=>`<div class="scb ${bc(c.c)}">${ab(c.c)} <span class="sd">${fs(c.dt)}</span></div>`).join('')}</div></div>`}).join('')});
+    const vc=vds.filter(d=>!$('dc'+d).classList.contains('hide')).length;
+    w.classList.remove('c1','c2');if(vc===1)w.classList.add('c1');else if(vc===2)w.classList.add('c2');
+}
+
+function uInfo(){
+    const ts=tls(new Date());$('todayDate').textContent=fd(ts);const f=gF();
+    const nx=f.filter(e=>e.dt>=ts).sort((a,b)=>a.dt.localeCompare(b.dt))[0];
+    if(nx){$('nextCount').textContent=`#${nx.s} ${nx.n}`;const dy=db(ts,nx.dt);$('daysUntil').textContent=dy===0?'TODAY!':`${dy} days`;$('daysUntil').classList.toggle('urgent',dy<=7)}else{$('nextCount').textContent='-';$('daysUntil').textContent='-'}
+    const ps=new Set();f.forEach(e=>{const du=db(ts,e.dt);if(du>0&&du<=P)ps.add(e.s)});$('inPrep').textContent=ps.size?`${ps.size} stores`:'None';
+}
+
+function showPop(ds,ev){
+    const pp=$('popup'),ov=$('popupOverlay'),ti=$('popupTitle'),co=$('popupContent');
+    const d=new Date(ds+'T00:00:00');ti.textContent=`${DN[d.getDay()]}, ${fd(ds)}`;let h='';
+    if(ev.counts.length){h+='<div class="ps"><div class="pst cts">📦 COUNT DAY</div>';const bs={};ev.counts.forEach(e=>{if(!bs[e.s])bs[e.s]={...e,cts:[]};bs[e.s].cts.push(e)});
+    Object.values(bs).forEach(s=>{h+=`<div class="pstr d${s.d}"><div class="psh"><div class="psn">#${s.s} ${s.n}</div><div class="psd">D${s.d} · ${s.sv}</div></div><div class="pcb">${s.cts.map(c=>`<span class="pcbd ${bc(c.c)}">${c.c} - ${c.ct}</span>`).join('')}</div></div>`});h+='</div>'}
+    if(ev.prep.length){h+='<div class="ps"><div class="pst prp">⚠️ PREP WINDOW</div>';const bs={};ev.prep.forEach(e=>{if(!bs[e.s])bs[e.s]={...e,cts:[],mn:e.du};bs[e.s].cts.push(e);if(e.du<bs[e.s].mn)bs[e.s].mn=e.du});
+    Object.values(bs).sort((a,b)=>a.mn-b.mn).forEach(s=>{h+=`<div class="pstr d${s.d}"><div class="psh"><div class="psn">#${s.s} ${s.n}</div><div class="psd">D${s.d} · ${s.sv}</div></div><div class="pcb">${s.cts.map(c=>`<span class="pcbd ${bc(c.c)}">${ab(c.c)} in ${c.du}d</span>`).join('')}</div></div>`});h+='</div>'}
+    co.innerHTML=h||'<p style="color:var(--text-muted)">No inventory activity.</p>';ov.classList.add('sh');pp.classList.add('sh');
+}
+function hidePop(){$('popup').classList.remove('sh');$('popupOverlay').classList.remove('sh')}
+$('popupClose').addEventListener('click',hidePop);$('popupOverlay').addEventListener('click',hidePop);document.addEventListener('keydown',e=>{if(e.key==='Escape')hidePop()});
+
+function rCal(){
+    const today=new Date(),cw=$('calWrap');cw.innerHTML='';const dt=new Date(today.getFullYear(),today.getMonth()+cOff,1),yr=dt.getFullYear(),mo=dt.getMonth();
+    const g=document.createElement('div');g.className='cal';DN.forEach(d=>{const h=document.createElement('div');h.className='wh';h.textContent=d;g.appendChild(h)});
+    const fd2=new Date(yr,mo,1).getDay(),dim=new Date(yr,mo+1,0).getDate(),ts=tls(today),fil=gF();
+    for(let i=0;i<fd2;i++){const e=document.createElement('div');e.className='dc ec';g.appendChild(e)}
+    for(let day=1;day<=dim;day++){const cd=new Date(yr,mo,day),ds=tls(cd),cts=[],prp=[];
+    fil.forEach(e=>{if(e.dt===ds)cts.push(e);else{const du=db(ds,e.dt);if(du>0&&du<=P)prp.push({...e,du})}});
+    const ev={counts:cts,prep:prp},cl=document.createElement('div');cl.className='dc';cl.dataset.date=ds;
+    if(ds===ts)cl.classList.add('td');if(cts.length){cl.classList.add('hc');if(cts.some(e=>e.c==='MAGIC'||e.c==='ALE'))cl.classList.add('hm')}else if(prp.length)cl.classList.add('pw');
+    const dn=document.createElement('div');dn.className='dn';dn.textContent=day;cl.appendChild(dn);
+    const dw=document.createElement('div');dw.className='dw';dw.textContent=DN[cd.getDay()];cl.appendChild(dw);
+    const tags=document.createElement('div');tags.className='st';
+    const cbs={};cts.forEach(e=>{if(!cbs[e.s])cbs[e.s]={...e,cts:[]};cbs[e.s].cts.push(e.c)});
+    Object.values(cbs).slice(0,3).forEach(s=>{const t=document.createElement('div');t.className=`stg d${s.d}`;t.innerHTML=`#${s.s} ${s.cts.map(c=>`<span class="cb ${bc(c)}">${ab(c)}</span>`).join('')}`;tags.appendChild(t)});
+    if(Object.keys(cbs).length>3){const m=document.createElement('div');m.className='tl';m.textContent=`+${Object.keys(cbs).length-3} more`;tags.appendChild(m)}
+    if(!cts.length&&prp.length){const ps={};prp.forEach(e=>{if(!ps[e.s])ps[e.s]={...e,mn:e.du};if(e.du<ps[e.s].mn)ps[e.s].mn=e.du});
+    Object.values(ps).sort((a,b)=>a.mn-b.mn).slice(0,3).forEach(s=>{const t=document.createElement('div');t.className=`stg d${s.d}`;t.style.opacity='.7';t.textContent=`#${s.s} (${s.mn}d)`;tags.appendChild(t)});
+    if(Object.keys(ps).length>3){const m=document.createElement('div');m.className='tl';m.textContent=`+${Object.keys(ps).length-3} more`;tags.appendChild(m)}}
+    cl.appendChild(tags);cl.addEventListener('click',()=>showPop(ds,ev));g.appendChild(cl)}
+    cw.appendChild(g);const my=`${MN[mo]} ${yr}`;$('navInfo').textContent=my;$('navInfo2').textContent=my;
+    $('prevBtn').disabled=cOff<=MNO;$('nextBtn').disabled=cOff>=MXO;$('prevBtn2').disabled=cOff<=MNO;$('nextBtn2').disabled=cOff>=MXO;
+}
+
+$('prevBtn').addEventListener('click',()=>{if(cOff>MNO){cOff--;rCal()}});$('nextBtn').addEventListener('click',()=>{if(cOff<MXO){cOff++;rCal()}});
+$('prevBtn2').addEventListener('click',()=>{if(cOff>MNO){cOff--;rCal()}});$('nextBtn2').addEventListener('click',()=>{if(cOff<MXO){cOff++;rCal()}});
+$('todayLeg').addEventListener('click',()=>{cOff=0;rCal()});
+
+rAll();
+</script>
+</body>
+</html>
